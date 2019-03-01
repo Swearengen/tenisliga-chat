@@ -1,28 +1,42 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import * as React from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+class App extends React.Component {
+
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      username: '',
+      userId: ''
+    }
   }
+
+  componentDidMount() {
+    console.log('ffff');
+    this.test()
+    fetch('http://localhost:3001/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: 'uuusername' })
+    })
+    // .then(response => {
+    //   this.setState({
+    //     currentUsername: username
+    //   })
+    // })
+    // .catch(error => console.error('error', error))
+  }
+
+  private test = () => {
+    console.log('gggg');
+
+  }
+
+  render() {
+    return <h1>Chatly</h1>
+  }
+
 }
 
 export default App;
