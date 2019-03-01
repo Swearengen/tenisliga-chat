@@ -30,7 +30,8 @@ app.post('/users', (req, res) => {
 	// 		} else {
 	// 			res.status(error.status).json(error)
 	// 		}
-	// 	})
+    // 	})
+
 })
 
 app.post('/authenticate', (req, res) => {
