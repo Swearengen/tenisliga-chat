@@ -1,4 +1,7 @@
 import * as React from 'react';
+import CssBaseline from '@material-ui/core/CssBaseline';
+
+import Dashboard from './dashboard/Dashboard'
 
 class App extends React.Component {
 
@@ -13,13 +16,13 @@ class App extends React.Component {
   componentDidMount() {
     console.log('ffff');
     this.test()
-    fetch('http://localhost:3001/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: 'uuusername' })
-    })
+    // fetch('http://localhost:3001/users', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ username: 'uuusername' })
+    // })
     // .then(response => {
     //   this.setState({
     //     currentUsername: username
@@ -34,7 +37,12 @@ class App extends React.Component {
   }
 
   render() {
-    return <h1>Chatly</h1>
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <Dashboard />
+      </React.Fragment>
+    )
   }
 
 }
