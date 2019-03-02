@@ -78,5 +78,5 @@ export const styles = (theme: any) => createStyles({
     },
     h5: {
       marginBottom: theme.spacing.unit * 2,
-    },
+    }
   });

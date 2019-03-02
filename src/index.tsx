@@ -3,4 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import Store from './store/store';
+
+var store = new Store()
+
+ReactDOM.render(<App store={store} />, document.getElementById('root'));

@@ -1,9 +1,17 @@
 import * as React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import { observer } from 'mobx-react';
+
+import Store from './store/store';
 
 import Dashboard from './dashboard/Dashboard'
 
-class App extends React.Component {
+interface Props {
+  store: Store
+}
+
+@observer
+class App extends React.Component<Props> {
 
   constructor(props: any) {
     super(props)
@@ -14,8 +22,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    console.log('ffff');
-    this.test()
+    this.props.store.updateTest();
     // fetch('http://localhost:3001/users', {
     //   method: 'POST',
     //   headers: {
@@ -31,16 +38,11 @@ class App extends React.Component {
     // .catch(error => console.error('error', error))
   }
 
-  private test = () => {
-    console.log('gggg');
-
-  }
-
   render() {
     return (
       <React.Fragment>
         <CssBaseline />
-        <Dashboard />
+        <Dashboard testStore={this.props.store.test} />
       </React.Fragment>
     )
   }
