@@ -28,7 +28,10 @@ const theme = createMuiTheme({
     primary: { main: '#00897B' }, // Purple and green play nicely together.
 		secondary: { main: '#F3E5F5' }, // This is just green.A700 as hex.
 		error: { main: '#D84315' }
-  }
+	},
+	typography: {
+    useNextVariants: true,
+  },
 });
 
 

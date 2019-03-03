@@ -1,10 +1,13 @@
 import * as React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { observer } from 'mobx-react';
+import * as _ from 'lodash';
 
 import Store from './store/store';
+import Dashboard from './components/dashboard/Dashboard'
+import { ErrorPage } from './components/errorPage';
 
-import Dashboard from './dashboard/Dashboard'
+import { getUrlParam } from './utils/urlParams'
 
 interface Props {
   store: Store
@@ -13,16 +16,17 @@ interface Props {
 @observer
 class App extends React.Component<Props> {
 
-  constructor(props: any) {
-    super(props)
-    this.state = {
-      username: '',
-      userId: ''
-    }
-  }
-
   componentDidMount() {
-    this.props.store.updateTest();
+    const { store } = this.props
+    store.updateTest();
+
+    const userName = getUrlParam('userName')
+    const userId = getUrlParam('userId')
+
+    if (userName && userId) {
+      store.setCurrentUser(userName, userId)
+    }
+
     // fetch('http://localhost:3001/users', {
     //   method: 'POST',
     //   headers: {
@@ -39,10 +43,16 @@ class App extends React.Component<Props> {
   }
 
   render() {
+    const { store } = this.props
+
     return (
       <React.Fragment>
         <CssBaseline />
-        <Dashboard testStore={this.props.store.test} />
+        {!_.isEmpty(store.currentUser) ? (
+          <Dashboard testStore={this.props.store.test} />
+        ) : (
+			<ErrorPage>Please provide userName and userId</ErrorPage>
+        )}
       </React.Fragment>
     )
   }
