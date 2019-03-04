@@ -1,24 +1,17 @@
 import React from 'react';
-// import cc from "classcat"
+import * as _ from 'lodash'
+
 import { observer } from 'mobx-react';
-import { WithStyles, withStyles, MuiThemeProvider, createMuiTheme, createStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import { WithStyles, withStyles, createStyles } from '@material-ui/core/styles';
+import grey from '@material-ui/core/colors/grey'
 
 import Store from '../store/store';
 import { Loader } from './Loader';
 import AppHeader  from './AppHeader'
 import Sidebar from './Sidebar';
+import MessagesList from './MessagesList';
 
-const theme = createMuiTheme({
-	palette: {
-		primary: { main: '#00897B' },
-		secondary: { main: '#F3E5F5' },
-		error: { main: '#D84315' }
-	},
-	typography: {
-		useNextVariants: true,
-	},
-});
+
 
 const styles = (theme: any) => createStyles({
     root: {
@@ -29,11 +22,12 @@ const styles = (theme: any) => createStyles({
       flexGrow: 1,
       padding: theme.spacing.unit * 3,
       height: '100vh',
-      overflow: 'auto',
+	  overflow: 'auto',
+	  background: theme.palette.background.default
     },
 })
 
-export const DRAWER_WIDTH = 240;
+export const DRAWER_WIDTH = 340;
 
 
 interface Props extends WithStyles<typeof styles> {
@@ -45,6 +39,13 @@ class Dashboard extends React.Component<Props> {
 	state = {
 		open: true,
 	};
+
+	componentDidUpdate() {
+		const { store } = this.props
+		if (store.currentUser) {
+			store.connectUser()
+		}
+	}
 
 	handleDrawerOpen = () => {
 		this.setState({ open: true });
@@ -66,21 +67,18 @@ class Dashboard extends React.Component<Props> {
 
 		return (
 			<div className={classes.root}>
-				<MuiThemeProvider theme={theme}>
 
-					<AppHeader open={this.state.open} handleDrawerOpen={this.handleDrawerOpen} />
-					<Sidebar open={this.state.open} handleDrawerClose={this.handleDrawerClose} />
+				<AppHeader open={this.state.open} handleDrawerOpen={this.handleDrawerOpen} />
+				<Sidebar open={this.state.open} handleDrawerClose={this.handleDrawerClose} />
 
-					<main className={classes.content}>
-						<div className={classes.appBarSpacer} />
-						<Typography variant="h4" gutterBottom component="h2">
-							{this.props.store.status}
-						</Typography>
-						<Typography variant="h4" gutterBottom component="h2">
-							Products
-						</Typography>
-					</main>
-				</MuiThemeProvider>
+				<main className={classes.content}>
+					<div className={classes.appBarSpacer} />
+					{/* <Typography variant="h4" gutterBottom component="h2">
+						{this.props.store.status}
+					</Typography> */}
+					{!_.isEmpty(store.messages) && <MessagesList messages={store.messages!} />}
+				</main>
+
 			</div>
 		);
 	}

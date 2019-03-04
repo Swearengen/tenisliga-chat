@@ -1,15 +1,19 @@
 import { observable, action, runInAction } from 'mobx';
+// import Chatkit from '@pusher/chatkit-client'
+const Chatkit = require('@pusher/chatkit-client'); // todo: why import is not working
+import * as _ from 'lodash'
 
-export interface CurrentUser {
-    userName: string;
-    userId: string;
-}
+import { CurrentUser, Room, Message } from './types'
 
 export default class Store {
     @observable currentUser?: CurrentUser;
     @observable status?: number;
     @observable initialErrorMessage?: string;
     @observable initialLoading: boolean = false;
+
+    @observable chatkitUser: Object = {}
+    @observable currentRoom?: Room
+    @observable messages?: Message[]
 
     @action
     setCurrentUser = (userName: string, userId: string) => {
@@ -48,4 +52,40 @@ export default class Store {
             })
         })
     }
+
+    @action
+    public connectUserRequest = () => {
+        const chatManager = new Chatkit.ChatManager({
+            instanceLocator: 'v1:us1:99cebb3b-bac8-4c5c-bcd1-cabf14849b0a',
+            userId: this.currentUser!.userId,
+            tokenProvider: new Chatkit.TokenProvider({
+                url: 'http://localhost:3001/authenticate',
+            }),
+        })
+
+        chatManager
+            .connect()
+            .then((currentUser: any) => {
+                this.chatkitUser = currentUser
+                currentUser.subscribeToRoom({
+                    roomId: "19392708",
+                    messageLimit: 100,
+                    hooks: {
+                        onMessage: (message: Message) => {
+                            console.log(message, 'mmmmm');
+                            this.messages = this.messages ? [...this.messages, message] : [message]
+                        }
+                    },
+                })
+                .then((currentRoom: Room) => {
+                    console.log(currentRoom, 'ffff');
+                    this.currentRoom = currentRoom
+                })
+            })
+            .catch((error: any) => {
+                console.error('error', error)
+            })
+    }
+
+    public connectUser = _.once(this.connectUserRequest)
 }
