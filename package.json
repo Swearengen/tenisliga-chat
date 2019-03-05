@@ -13,6 +13,7 @@
     "@types/react-dom": "16.8.2",
     "classcat": "^3.2.5",
     "cors": "^2.8.4",
+    "date-fns": "^1.30.1",
     "express": "^4.16.3",
     "lodash": "^4.17.11",
     "mobx": "^5.9.0",

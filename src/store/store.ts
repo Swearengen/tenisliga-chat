@@ -1,9 +1,9 @@
-import { observable, action, runInAction } from 'mobx';
+import { observable, action, runInAction, reaction, toJS } from 'mobx';
 // import Chatkit from '@pusher/chatkit-client'
 const Chatkit = require('@pusher/chatkit-client'); // todo: why import is not working
 import * as _ from 'lodash'
 
-import { CurrentUser, Room, Message } from './types'
+import { CurrentUser, Room, Message, RoomUser } from './types'
 
 export default class Store {
     @observable currentUser?: CurrentUser;
@@ -14,6 +14,7 @@ export default class Store {
     @observable chatkitUser: Object = {}
     @observable currentRoom?: Room
     @observable messages?: Message[]
+    @observable roomUsers?: RoomUser[]
 
     @action
     setCurrentUser = (userName: string, userId: string) => {
@@ -44,7 +45,6 @@ export default class Store {
             })
         })
         .catch(error => {
-            console.error('error', error)
             runInAction(() => {
                 this.status = error.status
                 this.initialLoading = false
@@ -67,19 +67,25 @@ export default class Store {
             .connect()
             .then((currentUser: any) => {
                 this.chatkitUser = currentUser
+
+
                 currentUser.subscribeToRoom({
                     roomId: "19392708",
                     messageLimit: 100,
                     hooks: {
                         onMessage: (message: Message) => {
-                            console.log(message, 'mmmmm');
                             this.messages = this.messages ? [...this.messages, message] : [message]
                         }
                     },
                 })
                 .then((currentRoom: Room) => {
-                    console.log(currentRoom, 'ffff');
                     this.currentRoom = currentRoom
+                    _.forEach(currentUser.users, (value) => {
+                        let roomUser = toJS(value)
+                        this.roomUsers = this.roomUsers ? [...this.roomUsers, roomUser] : [roomUser]
+                    });
+
+
                 })
             })
             .catch((error: any) => {

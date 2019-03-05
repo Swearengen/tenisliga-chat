@@ -3,13 +3,13 @@ import * as _ from 'lodash'
 
 import { observer } from 'mobx-react';
 import { WithStyles, withStyles, createStyles } from '@material-ui/core/styles';
-import grey from '@material-ui/core/colors/grey'
 
 import Store from '../store/store';
 import { Loader } from './Loader';
 import AppHeader  from './AppHeader'
 import Sidebar from './Sidebar';
 import MessagesList from './MessagesList';
+import MessageForm from './MessageForm';
 
 
 
@@ -20,7 +20,8 @@ const styles = (theme: any) => createStyles({
 	appBarSpacer: theme.mixins.toolbar,
     content: {
       flexGrow: 1,
-      padding: theme.spacing.unit * 3,
+	  paddingTop: theme.spacing.unit * 3,
+	  paddingBottom: '100px',
       height: '100vh',
 	  overflow: 'auto',
 	  background: theme.palette.background.default
@@ -55,9 +56,25 @@ class Dashboard extends React.Component<Props> {
 		this.setState({ open: false });
 	};
 
+	sendTypingEvent() {
+	    // this.state.currentUser
+	    //   .isTypingIn({ roomId: this.state.currentRoom.id })
+	    //   .catch(error => console.error('error', error))
+	}
+
+	sendMessage(text: string) {
+		console.log(text);
+
+		// this.state.currentUser.sendMessage({
+		//   text,
+		//   roomId: this.state.currentRoom.id,
+		// })
+	}
+
 	render() {
 		const { classes } = this.props
 		const { store } = this.props
+
 
 		if (store.initialLoading) {
 			return (
@@ -73,10 +90,16 @@ class Dashboard extends React.Component<Props> {
 
 				<main className={classes.content}>
 					<div className={classes.appBarSpacer} />
-					{/* <Typography variant="h4" gutterBottom component="h2">
-						{this.props.store.status}
-					</Typography> */}
-					{!_.isEmpty(store.messages) && <MessagesList messages={store.messages!} />}
+					{
+						!_.isEmpty(store.messages) &&
+						!_.isEmpty(store.roomUsers) &&
+						<MessagesList
+							messages={store.messages!}
+							roomUsers={store.roomUsers!}
+							currentUser={store.currentUser!}
+						/>
+					}
+					<MessageForm onChange={this.sendTypingEvent} onSubmit={this.sendMessage} />
 				</main>
 
 			</div>
