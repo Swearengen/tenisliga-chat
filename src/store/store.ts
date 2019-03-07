@@ -11,10 +11,11 @@ export default class Store {
     @observable initialErrorMessage?: string;
     @observable initialLoading: boolean = false;
 
-    @observable chatkitUser: Object = {}
+    @observable chatkitUser: any = {}
     @observable currentRoom?: Room
     @observable messages?: Message[]
     @observable roomUsers?: RoomUser[]
+    @observable usersWhoAreTyping: string[] = []
 
     @action
     setCurrentUser = (userName: string, userId: string) => {
@@ -68,13 +69,24 @@ export default class Store {
             .then((currentUser: any) => {
                 this.chatkitUser = currentUser
 
-
-                currentUser.subscribeToRoom({
+                this.chatkitUser.subscribeToRoom({
                     roomId: "19392708",
                     messageLimit: 100,
                     hooks: {
                         onMessage: (message: Message) => {
                             this.messages = this.messages ? [...this.messages, message] : [message]
+                        },
+                        onUserStartedTyping: (user: RoomUser) => {
+                            console.log(user, 'bbbb');
+
+                            this.usersWhoAreTyping = [...this.usersWhoAreTyping, user.name]
+                        },
+                        onUserStoppedTyping: (user: RoomUser) => {
+                            console.log('ffffdsfdaddadad');
+
+                            this.usersWhoAreTyping = this.usersWhoAreTyping.filter(
+                                username => username !== user.name
+                            )
                         }
                     },
                 })

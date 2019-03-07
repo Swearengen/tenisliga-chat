@@ -4,11 +4,8 @@ import { withStyles, WithStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
 const styles = (theme: any) => ({
-    root: {
-
-    },
-    textField: {
-
+    input: {
+        backgroundColor: '#fff',
     }
 })
 
@@ -31,8 +28,7 @@ class MessageForm extends React.Component<Props, State> {
         }
     }
 
-    onSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
+    onSubmit = () => {
         this.props.onSubmit(this.state.text)
         this.setState({ text: '' })
     }
@@ -44,29 +40,36 @@ class MessageForm extends React.Component<Props, State> {
         }
     }
 
+    onKeyPress = (e: any) => {
+        if (e.key === 'Enter' && e.shiftKey) {
+            this.setState({text: `${this.state.text}\n`})
+            e.preventDefault();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            this.onSubmit()
+        }
+    }
+
     render () {
         const { classes } = this.props
 
         return (
-            <div className={classes.root}>
-                <form noValidate autoComplete="off">
-                    <TextField
-                        id="standard-multiline-flexible"
-                        placeholder="Placeholder"
-                        multiline
-                        rowsMax="3"
-                        value={`sdadasdas \n dsdsadas`}
-                        onChange={this.onChange}
-                        className={classes.textField}
-                        fullWidth
-                        variant="outlined"
-                        margin="normal"
-                        style={{
-                            backgroundColor: "#fff"
-                        }}
-                    />
-                </form>
-            </div>
+            <form noValidate autoComplete="off">
+                <TextField
+                    id="standard-multiline-flexible"
+                    placeholder="Placeholder"
+                    multiline
+                    rowsMax="3"
+                    // value={`sdadasdas \n dsdsadas`}
+                    value={this.state.text}
+                    onChange={this.onChange}
+                    fullWidth
+                    variant="outlined"
+                    margin="normal"
+                    InputProps={{className: classes.input}}
+                    onKeyPress={this.onKeyPress}
+                />
+            </form>
         )
     }
 }

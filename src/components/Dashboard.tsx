@@ -10,6 +10,7 @@ import AppHeader  from './AppHeader'
 import Sidebar from './Sidebar';
 import MessagesList from './MessagesList';
 import MessageForm from './MessageForm';
+import TypingIndicator from './TypingIndicator';
 
 
 
@@ -19,12 +20,20 @@ const styles = (theme: any) => createStyles({
 	},
 	appBarSpacer: theme.mixins.toolbar,
     content: {
-      flexGrow: 1,
-	  paddingTop: theme.spacing.unit * 3,
-	  paddingBottom: '100px',
-      height: '100vh',
-	  overflow: 'auto',
-	  background: theme.palette.background.default
+		flexGrow: 1,
+		paddingTop: theme.spacing.unit * 3,
+		paddingBottom: '140px',
+		height: '100vh',
+		overflow: 'auto',
+		background: theme.palette.background.default,
+		position: 'relative'
+	},
+	footer: {
+        position: 'absolute' as 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: '25px 40px',
     },
 })
 
@@ -56,19 +65,25 @@ class Dashboard extends React.Component<Props> {
 		this.setState({ open: false });
 	};
 
-	sendTypingEvent() {
-	    // this.state.currentUser
-	    //   .isTypingIn({ roomId: this.state.currentRoom.id })
-	    //   .catch(error => console.error('error', error))
+	sendTypingEvent = () => {
+		const { store } = this.props
+
+		store.chatkitUser.isTypingIn({roomId: store.currentRoom!.id})
+		.then(() => {
+			console.log('Success')
+		})
+		.catch((error: any) => {
+			console.log(error)
+		})
+
 	}
 
-	sendMessage(text: string) {
-		console.log(text);
-
-		// this.state.currentUser.sendMessage({
-		//   text,
-		//   roomId: this.state.currentRoom.id,
-		// })
+	sendMessage = (text: string) => {
+		const { store } = this.props
+		store.chatkitUser.sendMessage({
+		  text,
+		  roomId: store.currentRoom!.id
+		})
 	}
 
 	render() {
@@ -99,7 +114,10 @@ class Dashboard extends React.Component<Props> {
 							currentUser={store.currentUser!}
 						/>
 					}
-					<MessageForm onChange={this.sendTypingEvent} onSubmit={this.sendMessage} />
+					<div className={classes.footer}>
+						<TypingIndicator usersWhoAreTyping={store.usersWhoAreTyping} />
+						<MessageForm onChange={this.sendTypingEvent} onSubmit={this.sendMessage} />
+					</div>
 				</main>
 
 			</div>

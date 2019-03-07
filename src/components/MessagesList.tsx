@@ -18,6 +18,7 @@ import teal from '@material-ui/core/colors/teal';
 import avatarPlaceholder from '../assets/avatarPlaceholder.png'
 
 import { formatMessageDate } from '../utils/general'
+import { Grid } from '@material-ui/core';
 
 const styles = (theme: any) => ({
     messageText: {
@@ -96,15 +97,19 @@ class MessagesList extends React.Component<Props> {
 
     render() {
         return (
-            <List>
-                {this.props.messages.map((message) => (
-                    message.senderId === this.props.currentUser.userId ? (
-                        this.renderOwnMessages(message)
-                    ) : (
-                        this.renderOtherUserMessage(message)
-                    )
-                ))}
-            </List>
+            <Grid container justify = "center">
+                <Grid item xs={10}>
+                    <List>
+                        {this.props.messages.map((message) => (
+                            message.senderId === this.props.currentUser.userId ? (
+                                this.renderOwnMessages(message)
+                            ) : (
+                                this.renderOtherUserMessage(message)
+                            )
+                        ))}
+                    </List>
+                </Grid>
+            </Grid>
         )
     }
 }
