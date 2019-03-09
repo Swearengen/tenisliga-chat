@@ -1,4 +1,4 @@
-import { observable, action, runInAction, reaction, toJS } from 'mobx';
+import { observable, action, runInAction, reaction } from 'mobx';
 // import Chatkit from '@pusher/chatkit-client'
 const Chatkit = require('@pusher/chatkit-client'); // todo: why import is not working
 import * as _ from 'lodash'
@@ -77,13 +77,9 @@ export default class Store {
                             this.messages = this.messages ? [...this.messages, message] : [message]
                         },
                         onUserStartedTyping: (user: RoomUser) => {
-                            console.log(user, 'bbbb');
-
                             this.usersWhoAreTyping = [...this.usersWhoAreTyping, user.name]
                         },
                         onUserStoppedTyping: (user: RoomUser) => {
-                            console.log('ffffdsfdaddadad');
-
                             this.usersWhoAreTyping = this.usersWhoAreTyping.filter(
                                 username => username !== user.name
                             )
@@ -93,7 +89,7 @@ export default class Store {
                 .then((currentRoom: Room) => {
                     this.currentRoom = currentRoom
                     _.forEach(currentUser.users, (value) => {
-                        let roomUser = toJS(value)
+                        let roomUser = value
                         this.roomUsers = this.roomUsers ? [...this.roomUsers, roomUser] : [roomUser]
                     });
 
