@@ -62,8 +62,40 @@ interface Props extends WithStyles<typeof styles> {
     currentUser: CurrentUser;
 }
 
+interface State {
+	messagesScrolled: boolean
+}
+
 @observer
-class MessagesList extends React.Component<Props> {
+class MessagesList extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+		super(props)
+		this.state = {
+			messagesScrolled: false,
+		}
+	}
+
+    componentWillUnmount() {
+        if (this.messagesCont) {
+            this.messagesCont.removeEventListener('scroll', this.handleScroll);
+        }
+    }
+
+    messagesContDidMount = (node: any) => {
+        this.messagesCont = node
+        this.messagesCont.addEventListener("scroll", this.handleScroll)
+    }
+
+    handleScroll = _.debounce((event: any) => {
+        console.log('sss', event);
+        const { scrollTop, offsetHeight, scrollHeight } = event.srcElement
+        if (scrollTop + offsetHeight === scrollHeight) {
+            this.setState({ messagesScrolled: true })
+        } else {
+            this.setState({ messagesScrolled: false })
+        }
+    }, 150);
 
     messagesCont: any = React.createRef()
 
@@ -115,12 +147,12 @@ class MessagesList extends React.Component<Props> {
     }
 
     scrollToBottom = () => {
-        this.messagesCont.current!.scroll({top: this.messagesCont.current.clientHeight})
+        this.messagesCont.scroll({top: this.messagesCont.clientHeight})
     }
 
     render() {
         return (
-            <div className={this.props.classes.listCont} ref={this.messagesCont}>
+            <div className={this.props.classes.listCont} ref={this.messagesContDidMount}>
                 <Grid container justify = "center">
                     <Grid item xs={10}>
                         <List>
@@ -355,10 +387,11 @@ class MessagesList extends React.Component<Props> {
                         </List>
                     </Grid>
                 </Grid>
-                {/* <div ref={this.messagesEnd} /> */}
-                <div className={this.props.classes.scrollToEnd} onClick={this.scrollToBottom}>
-                    <KeyboardArrowDown />
-                </div>
+                {!this.state.messagesScrolled &&
+                    <div className={this.props.classes.scrollToEnd} onClick={this.scrollToBottom}>
+                        <KeyboardArrowDown />
+                    </div>
+                }
             </div>
         )
     }

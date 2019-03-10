@@ -43,11 +43,19 @@ interface Props extends WithStyles<typeof styles> {
 	store: Store
 }
 
+interface State {
+	open: boolean
+}
+
 @observer
-class Dashboard extends React.Component<Props> {
-	state = {
-		open: true,
-	};
+class Dashboard extends React.Component<Props, State> {
+
+	constructor(props: Props) {
+		super(props)
+		this.state = {
+			open: true,
+		}
+	}
 
 	componentDidUpdate() {
 		const { store } = this.props
