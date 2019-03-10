@@ -69,8 +69,8 @@ export default class Store {
             .then((currentUser: any) => {
                 this.chatkitUser = currentUser
 
-                this.chatkitUser.subscribeToRoom({
-                    roomId: "19392708",
+                this.chatkitUser.subscribeToRoomMultipart({
+                    roomId: "19398846",
                     messageLimit: 100,
                     hooks: {
                         onMessage: (message: Message) => {

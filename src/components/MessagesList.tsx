@@ -16,6 +16,9 @@ import Typography from '@material-ui/core/Typography';
 import teal from '@material-ui/core/colors/teal';
 
 import avatarPlaceholder from '../assets/avatarPlaceholder.png'
+import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
+
+import grey from '@material-ui/core/colors/grey'
 
 import { formatMessageDate } from '../utils/general'
 import { Grid } from '@material-ui/core';
@@ -33,6 +36,23 @@ const styles = (theme: any) => ({
     own: {},
     listText: {
         flex: '0 0 auto'
+    },
+    listCont: {
+        position: 'absolute' as 'absolute',
+        height: '100%',
+        overflow: 'scroll',
+        left: '0',
+        right: '0',
+        paddingBottom: '190px',
+    },
+    scrollToEnd: {
+        position: 'fixed' as 'fixed',
+        background: grey[300],
+        bottom: '150px',
+        right: '20px',
+        padding: '3px',
+        borderRadius: '50%',
+        cursor: 'pointer'
     }
 });
 
@@ -44,6 +64,8 @@ interface Props extends WithStyles<typeof styles> {
 
 @observer
 class MessagesList extends React.Component<Props> {
+
+    messagesCont: any = React.createRef()
 
     getSenderName = (senderId: string) => {
         let sender = _.find(this.props.roomUsers, {id: senderId}) as RoomUser
@@ -64,7 +86,7 @@ class MessagesList extends React.Component<Props> {
                     }
                     secondary={
                         <Typography variant="body2" className={this.props.classes.messageText}>
-                            {message.text}
+                            {message.parts[0].payload.content}
                         </Typography>
                     }
                 />
@@ -84,7 +106,7 @@ class MessagesList extends React.Component<Props> {
                     }
                     secondary={
                         <Typography variant="body2" className={cc([classes.messageText, classes.own])}>
-                            {message.text}
+                            {message.parts[0].payload.content}
                         </Typography>
                     }
                 />
@@ -92,24 +114,252 @@ class MessagesList extends React.Component<Props> {
         )
     }
 
-
-
+    scrollToBottom = () => {
+        this.messagesCont.current!.scroll({top: this.messagesCont.current.clientHeight})
+    }
 
     render() {
         return (
-            <Grid container justify = "center">
-                <Grid item xs={10}>
-                    <List>
-                        {this.props.messages.map((message) => (
-                            message.senderId === this.props.currentUser.userId ? (
-                                this.renderOwnMessages(message)
-                            ) : (
-                                this.renderOtherUserMessage(message)
-                            )
-                        ))}
-                    </List>
+            <div className={this.props.classes.listCont} ref={this.messagesCont}>
+                <Grid container justify = "center">
+                    <Grid item xs={10}>
+                        <List>
+                            {this.props.messages.map((message) => (
+                                message.senderId === this.props.currentUser.userId ? (
+                                    this.renderOwnMessages(message)
+                                ) : (
+                                    this.renderOtherUserMessage(message)
+                                )
+                            ))}
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                            <ListItem alignItems="flex-start">
+                                <ListItemAvatar>
+                                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
+                                </ListItemAvatar>
+                                <ListItemText className={this.props.classes.listText}
+                                    primary={
+                                        <Typography component="div" variant="caption">
+                                            <strong>fsdfds</strong>: dsfdsf
+                                        </Typography>
+                                    }
+                                    secondary={
+                                        <Typography variant="body2" className={this.props.classes.messageText}>
+                                            fdsfsd
+                                        </Typography>
+                                    }
+                                />
+                            </ListItem>
+                        </List>
+                    </Grid>
                 </Grid>
-            </Grid>
+                {/* <div ref={this.messagesEnd} /> */}
+                <div className={this.props.classes.scrollToEnd} onClick={this.scrollToBottom}>
+                    <KeyboardArrowDown />
+                </div>
+            </div>
         )
     }
 }

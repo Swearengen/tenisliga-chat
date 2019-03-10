@@ -12,28 +12,27 @@ import MessagesList from './MessagesList';
 import MessageForm from './MessageForm';
 import TypingIndicator from './TypingIndicator';
 
-
-
 const styles = (theme: any) => createStyles({
     root: {
       display: 'flex',
+	  height: '100vh',
 	},
 	appBarSpacer: theme.mixins.toolbar,
     content: {
 		flexGrow: 1,
-		paddingTop: theme.spacing.unit * 3,
-		paddingBottom: '140px',
-		height: '100vh',
-		overflow: 'auto',
+		paddingTop: '65px',
+		overflow: 'hidden',
 		background: theme.palette.background.default,
-		position: 'relative'
+		position: 'relative',
 	},
 	footer: {
         position: 'absolute' as 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: '25px 40px',
+		padding: '15px 30px',
+		background: theme.palette.background.default,
+		borderTop: '1px solid #c5c5c5'
     },
 })
 
@@ -80,7 +79,7 @@ class Dashboard extends React.Component<Props> {
 
 	sendMessage = (text: string) => {
 		const { store } = this.props
-		store.chatkitUser.sendMessage({
+		store.chatkitUser.sendSimpleMessage({
 		  text,
 		  roomId: store.currentRoom!.id
 		})
@@ -104,15 +103,16 @@ class Dashboard extends React.Component<Props> {
 				<Sidebar open={this.state.open} handleDrawerClose={this.handleDrawerClose} />
 
 				<main className={classes.content}>
-					<div className={classes.appBarSpacer} />
 					{
 						!_.isEmpty(store.messages) &&
 						!_.isEmpty(store.roomUsers) &&
-						<MessagesList
-							messages={store.messages!}
-							roomUsers={store.roomUsers!}
-							currentUser={store.currentUser!}
-						/>
+						<div>
+							<MessagesList
+								messages={store.messages!}
+								roomUsers={store.roomUsers!}
+								currentUser={store.currentUser!}
+							/>
+						</div>
 					}
 					<div className={classes.footer}>
 						<TypingIndicator usersWhoAreTyping={store.usersWhoAreTyping} />

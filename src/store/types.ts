@@ -22,7 +22,23 @@ export interface Message {
     id: number;
     roomId: string;
     senderId: string;
-    text: string;
+    parts: Part[];
     createdAt: string;
     updatedAt: string;
+}
+
+export enum PartType {
+    INLINE = "inline",
+    // URL = "url",
+    // ATTACHMENT = "attachment"
+}
+
+interface MessagePayload {
+    type: string;
+    content: string;
+}
+
+export interface Part {
+    type: PartType,
+    payload: MessagePayload
 }

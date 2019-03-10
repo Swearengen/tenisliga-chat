@@ -4,6 +4,9 @@ import { withStyles, WithStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
 const styles = (theme: any) => ({
+    root: {
+        marginTop: '10px',
+    },
     input: {
         backgroundColor: '#fff',
     }
@@ -60,7 +63,6 @@ class MessageForm extends React.Component<Props, State> {
                     placeholder="Placeholder"
                     multiline
                     rowsMax="3"
-                    // value={`sdadasdas \n dsdsadas`}
                     value={this.state.text}
                     onChange={this.onChange}
                     fullWidth
@@ -68,6 +70,7 @@ class MessageForm extends React.Component<Props, State> {
                     margin="normal"
                     InputProps={{className: classes.input}}
                     onKeyPress={this.onKeyPress}
+                    className={classes.root}
                 />
             </form>
         )
