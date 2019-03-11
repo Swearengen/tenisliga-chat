@@ -8,7 +8,7 @@ import Store from '../store/store';
 import { Loader } from './Loader';
 import AppHeader  from './AppHeader'
 import Sidebar from './Sidebar';
-import MessagesList from './MessagesList';
+import MessagesList from './Messages/MessagesList';
 import MessageForm from './MessageForm';
 import TypingIndicator from './TypingIndicator';
 
@@ -76,13 +76,9 @@ class Dashboard extends React.Component<Props, State> {
 		const { store } = this.props
 
 		store.chatkitUser.isTypingIn({roomId: store.currentRoom!.id})
-		.then(() => {
-			console.log('Success')
-		})
-		.catch((error: any) => {
-			console.log(error)
-		})
-
+			.catch((error: any) => {
+				console.log(error)
+			})
 	}
 
 	sendMessage = (text: string) => {
