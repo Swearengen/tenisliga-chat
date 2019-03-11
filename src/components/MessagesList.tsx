@@ -76,6 +76,7 @@ class MessagesList extends React.Component<Props, State> {
 		}
 	}
 
+    // odvojit komponentu za scroll i message
     componentWillUnmount() {
         if (this.messagesCont) {
             this.messagesCont.removeEventListener('scroll', this.handleScroll);
@@ -84,11 +85,15 @@ class MessagesList extends React.Component<Props, State> {
 
     messagesContDidMount = (node: any) => {
         this.messagesCont = node
+        const { height } = node.getBoundingClientRect()
+        const scrollHeight = node.scrollHeight
+        if (scrollHeight === height) {
+            this.setState({messagesScrolled: true})
+        }
         this.messagesCont.addEventListener("scroll", this.handleScroll)
     }
 
     handleScroll = _.debounce((event: any) => {
-        console.log('sss', event);
         const { scrollTop, offsetHeight, scrollHeight } = event.srcElement
         if (scrollTop + offsetHeight === scrollHeight) {
             this.setState({ messagesScrolled: true })
@@ -98,6 +103,10 @@ class MessagesList extends React.Component<Props, State> {
     }, 150);
 
     messagesCont: any = React.createRef()
+
+    scrollToBottom = () => {
+        this.messagesCont.scroll({top: this.messagesCont.clientHeight})
+    }
 
     getSenderName = (senderId: string) => {
         let sender = _.find(this.props.roomUsers, {id: senderId}) as RoomUser
@@ -144,10 +153,6 @@ class MessagesList extends React.Component<Props, State> {
                 />
             </ListItem>
         )
-    }
-
-    scrollToBottom = () => {
-        this.messagesCont.scroll({top: this.messagesCont.clientHeight})
     }
 
     render() {
