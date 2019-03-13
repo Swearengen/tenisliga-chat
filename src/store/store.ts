@@ -69,6 +69,24 @@ export default class Store {
             .then((currentUser: any) => {
                 this.chatkitUser = currentUser
 
+                // 1. popis idejava svih soba treba dohvatit na serveru, metoda je getUserRooms
+                    // proc kroz popis i u channels dodat sve sobe koje su public i koji su sobe od svake lige (customData neki)
+                    // ostale su znaci privatne poruke
+
+                // 2. postavit na pocetku da je currentRoom general soba
+
+                // 3. tu se subscrijba i dodaje u general sobu
+                    // trebalo bi tu subscrijabat na sve sobe
+                    // u onMessage hook metodi odoavat message u store po id-ju
+                    // u started i stoped typing metodama zapisivat u store samo ako je trenutni id jednak currentRoom id-ju
+
+                // 4. kad netko zeli promjenit sobu klikajuci po kanalima
+                // samo mjenjam currentRoom i u metodi getCurrentMessages (nova metoda) vracam trenutne poruke
+
+                // 5. kad dodam search za usere, odabirom iz dropdowna provjeravam dal postoji private soba sa tim userom
+                    // ako postoji uzmem id te sobe i postavljam je kao currentRomm
+                    // ako ne postoji kreiram novu sobu i postavljam je kao currentRoom
+
                 this.chatkitUser.subscribeToRoomMultipart({
                     roomId: "19398846",
                     messageLimit: 100,

@@ -8,12 +8,11 @@ import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import PeopleIcon from '@material-ui/icons/People';
+import PersonIcon from '@material-ui/icons/Person';
 
 import { DRAWER_WIDTH } from './Dashboard'
 
@@ -34,7 +33,7 @@ export const styles = (theme: any) => createStyles({
           duration: theme.transitions.duration.enteringScreen,
         }),
       },
-      drawerPaperClose: {
+    drawerPaperClose: {
         overflowX: 'hidden',
         transition: theme.transitions.create('width', {
           easing: theme.transitions.easing.sharp,
@@ -46,7 +45,22 @@ export const styles = (theme: any) => createStyles({
                 display: 'block',
           width: theme.spacing.unit * 9,
         },
-      }
+    },
+    nestedListItem: {
+        paddingLeft: '25px',
+        '&$selected': {
+            color: '#3c3c3c',
+            fontWeight: 900
+        },
+    },
+    selected: {},
+    secondary: {
+        color: 'inherit',
+        fontWeight: 'inherit'
+    },
+    disabled: {
+        opacity: 1
+    }
 })
 
 interface Props extends WithStyles<typeof styles> {
@@ -74,24 +88,39 @@ class Sidebar extends React.Component<Props> {
 
                 <List>
                     <div>
-                        <ListItem button>
+                        <ListItem button disabled classes={{disabled: classes.disabled}}>
                             <ListItemIcon>
-                                <DashboardIcon />
+                                <PeopleIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Dashboard" />
+                            <ListItemText primary="Rooms" />
                         </ListItem>
-                        <ListItem button>
-                            <ListItemIcon>
-                                <ShoppingCartIcon />
-                            </ListItemIcon>
-                            <ListItemText primary="Orders" />
+                        <ListItem button selected classes={{
+                            root: classes.nestedListItem,
+                            selected: classes.selected
+                        }}>
+                            <ListItemText secondary="General" classes={{secondary: classes.secondary}}/>
+                        </ListItem>
+                        <ListItem button className={classes.nestedListItem}>
+                            <ListItemText secondary="3.A liga 2019/10" />
                         </ListItem>
                     </div>
                 </List>
                 <Divider />
-
                 <List>
-                    <ListSubheader inset>Saved reports</ListSubheader>
+                    <div>
+                        <ListItem button disabled classes={{disabled: classes.disabled}}>
+                            <ListItemIcon>
+                                <PersonIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="People" />
+                        </ListItem>
+                        <ListItem button className={classes.nestedListItem}>
+                            <ListItemText secondary="Neko ime" />
+                        </ListItem>
+                        <ListItem button className={classes.nestedListItem}>
+                            <ListItemText secondary="Drugo ime" />
+                        </ListItem>
+                    </div>
                 </List>
             </Drawer>
         )
