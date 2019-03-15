@@ -9,7 +9,7 @@ import grey from '@material-ui/core/colors/grey'
 
 import Store from './store/store';
 import Dashboard from './components/Dashboard'
-import { ErrorPage } from './components/ErrorPage';
+import { ErrorPage } from './components/UtilComponents/ErrorPage';
 
 import { getUrlParam } from './utils/urlParams'
 

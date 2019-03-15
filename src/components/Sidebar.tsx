@@ -15,12 +15,13 @@ import PeopleIcon from '@material-ui/icons/People';
 import PersonIcon from '@material-ui/icons/Person';
 
 import { DRAWER_WIDTH } from './Dashboard'
+import Search from './Search';
 
 export const styles = (theme: any) => createStyles({
-    toolbarIcon: {
+    toolbar: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         padding: '0 8px',
         ...theme.mixins.toolbar,
     },
@@ -79,7 +80,8 @@ class Sidebar extends React.Component<Props> {
                 classes={{ paper: cc([classes.drawerPaper, !this.props.open && classes.drawerPaperClose]) }}
                 open={this.props.open}
             >
-                <div className={classes.toolbarIcon}>
+                <div className={classes.toolbar}>
+                    <Search />
                     <IconButton onClick={this.props.handleDrawerClose}>
                         <ChevronLeftIcon />
                     </IconButton>
