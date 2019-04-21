@@ -2,23 +2,26 @@ import React from 'react';
 import * as _ from 'lodash'
 
 import { observer } from 'mobx-react';
+import { toJS } from 'mobx';
+
 import { WithStyles, withStyles, createStyles } from '@material-ui/core/styles';
 
-import Store from '../store/store';
-import { Loader } from './UtilComponents/Loader';
-import AppHeader  from './Header'
-import Sidebar from './Sidebar';
-import MessagesList from './Messages/MessagesList';
-import MessageForm from './Messages/MessageForm';
-import TypingIndicator from './Messages/TypingIndicator';
+import { Store } from '../store/store';
+import { Loader } from '../components/utils/Loader';
+import { ErrorPage } from '../components/utils/ErrorPage';
+// import AppHeader from './Header'
+// import Sidebar from './Sidebar/Sidebar';
+// import MessagesList from './Messages/MessagesList';
+import MessageForm from './messages/MessageForm';
+import TypingIndicator from './messages/TypingIndicator';
 
 const styles = (theme: any) => createStyles({
-    root: {
-      display: 'flex',
-	  height: '100vh',
+	root: {
+		display: 'flex',
+		height: '100vh',
 	},
 	appBarSpacer: theme.mixins.toolbar,
-    content: {
+	content: {
 		flexGrow: 1,
 		paddingTop: '65px',
 		overflow: 'hidden',
@@ -26,20 +29,22 @@ const styles = (theme: any) => createStyles({
 		position: 'relative',
 	},
 	footer: {
-        position: 'absolute' as 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+		position: 'absolute' as 'absolute',
+		bottom: 0,
+		left: 0,
+		right: 0,
 		padding: '15px 30px',
 		background: theme.palette.background.default,
 		borderTop: '1px solid #c5c5c5'
-    },
+	},
 })
 
 export const DRAWER_WIDTH = 340;
 
 
 interface Props extends WithStyles<typeof styles> {
+    userName: string
+    userId: string
 	store: Store
 }
 
@@ -57,10 +62,22 @@ class Dashboard extends React.Component<Props, State> {
 		}
 	}
 
-	componentDidUpdate() {
+	componentDidMount() {
 		const { store } = this.props
-		if (store.currentUser) {
-			store.connectUser()
+
+			console.log('prefetching');
+
+			// dohvatit usera s tim userNameom i userId-om
+			// ako ne postoji, ispisat error
+			// ako postoji spremit userId u store
+
+			// loadat userJoinedRooms i cursors, spremit ih u state
+			// nakon toga pozvat connectUser
+
+		if (window.innerWidth < 790) {
+			this.setState({
+				open: false
+			})
 		}
 	}
 
@@ -72,55 +89,79 @@ class Dashboard extends React.Component<Props, State> {
 		this.setState({ open: false });
 	};
 
-	sendTypingEvent = () => {
-		const { store } = this.props
-
-		store.chatkitUser.isTypingIn({roomId: store.currentRoom!.id})
-			.catch((error: any) => {
-				console.log(error)
-			})
+	onMessageFormChange = (text: string) => {
+		this.props.store.setMessageToSend(text)
 	}
 
-	sendMessage = (text: string) => {
-		const { store } = this.props
-		store.chatkitUser.sendSimpleMessage({
-		  text,
-		  roomId: store.currentRoom!.id
-		})
+	sendMessage = () => {
+		this.props.store.sendMessage()
 	}
 
 	render() {
 		const { classes } = this.props
 		const { store } = this.props
 
-
-		if (store.initialLoading) {
+		if (store.loading) {
 			return (
 				<Loader />
+			)
+		}
+
+		if (store.errorMessage) {
+			return (
+				<ErrorPage>{store.errorMessage}</ErrorPage>
 			)
 		}
 
 		return (
 			<div className={classes.root}>
 
-				<AppHeader open={this.state.open} handleDrawerOpen={this.handleDrawerOpen} />
-				<Sidebar open={this.state.open} handleDrawerClose={this.handleDrawerClose} />
+				{/* <AppHeader
+					open={this.state.open}
+					shouldDisplayNotification={store.shouldDisplayHeaderNotification}
+					handleDrawerOpen={this.handleDrawerOpen}
+					currentRoom={store.currentRoom!}
+				/>
+				<Sidebar
+					open={this.state.open}
+					currentRoomId={store.currentRoomId!}
+					userId={this.props.userId}
+					publicRooms={store.publicRooms}
+					privateRooms={store.privateRooms}
+					notificationsCollection={store.notificationsCollection}
+					leagueRoom={store.leagueRoom}
+					leagueUsers={store.usersFromLeagueRoom}
+					handleDrawerClose={this.handleDrawerClose}
+					changeRoom={store.changeRoom}
+					leagueUserClicked={store.leagueUserClicked}
+					presenceData={toJS(store.presenceData)}
+				/> */}
 
 				<main className={classes.content}>
 					{
 						!_.isEmpty(store.messages) &&
-						!_.isEmpty(store.roomUsers) &&
+						!_.isEmpty(store.currentRoom) &&
 						<div>
-							<MessagesList
+							messages list
+							{/* <MessagesList
 								messages={store.messages!}
-								roomUsers={store.roomUsers!}
-								currentUser={store.currentUser!}
-							/>
+								roomUsers={store.currentRoom!.users}
+								userId={this.props.userId}
+								lastMessageId={store.getLastMessageId}
+								currentRoomId={store.currentRoomId!}
+								loadingOlder={store.loadingOlderMessages}
+								onSetCursor={store.setCursor}
+								loadOlder={store.loadOlderMessages}
+							/> */}
 						</div>
 					}
 					<div className={classes.footer}>
-						<TypingIndicator usersWhoAreTyping={store.usersWhoAreTyping} />
-						<MessageForm onChange={this.sendTypingEvent} onSubmit={this.sendMessage} />
+						<TypingIndicator usersWhoAreTyping={store.usersWhoAreTypingInRoom} />
+						<MessageForm
+							value={store.messageToSend}
+							onChange={this.onMessageFormChange}
+							onSubmit={this.sendMessage}
+						/>
 					</div>
 				</main>
 

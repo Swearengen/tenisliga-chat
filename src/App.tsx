@@ -9,7 +9,7 @@ import grey from '@material-ui/core/colors/grey'
 
 import Store from './store/store';
 import Dashboard from './components/Dashboard'
-import { ErrorPage } from './components/UtilComponents/ErrorPage';
+import { ErrorPage } from './components/utils/ErrorPage';
 
 import { getUrlParam } from './utils/urlParams'
 
@@ -29,35 +29,36 @@ interface Props {
 	store: Store
 }
 
+interface State {
+	userName?: string
+	userId?: string
+}
+
 @observer
-class App extends React.Component<Props> {
+class App extends React.Component<Props, State> {
+
+	state: State = {}
 
 	componentDidMount() {
-		const { store } = this.props
 
 		const userName = getUrlParam('userName')
 		const userId = getUrlParam('userId')
 
-		if (userName && userId) {
-			store.setCurrentUser(userName, userId)
-			// store.createChatkitUser(userName, userId)
-		} else {
-			store.setInitialErrorMessage('Please provide userName and userId')
-		}
+		this.setState({
+			userId, userName
+		})
 	}
 
 	render() {
-		const { store } = this.props
-
 		return (
 			<MuiThemeProvider theme={theme}>
 				<React.Fragment>
 					<CssBaseline />
-					{store.initialErrorMessage ? (
-						<ErrorPage>{store.initialErrorMessage}</ErrorPage>
+					{!this.state.userId || !this.state.userName ? (
+						<ErrorPage>Please provide UserName and UserId</ErrorPage>
 					) : (
-							<Dashboard store={this.props.store} />
-						)}
+						<Dashboard store={this.props.store} userId={this.state.userId} userName={this.state.userName} />
+					)}
 				</React.Fragment>
 			</MuiThemeProvider>
 		)

@@ -1,112 +1,158 @@
 import React from 'react'
 import * as _ from 'lodash'
-import cc from 'classcat'
 
-import { Message, RoomUser, CurrentUser } from '../../store/types'
+import {Events, Element, animateScroll as scroll, scroller } from 'react-scroll'
+
+import { Message, RoomUser } from '../../store/types'
 
 import { Grid } from '@material-ui/core';
 import { withStyles, WithStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
-import teal from '@material-ui/core/colors/teal';
+import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
+import grey from '@material-ui/core/colors/grey'
 
-
-import avatarPlaceholder from '../../assets/avatarPlaceholder.png'
-import { formatMessageDate } from '../../utils/general'
-import ScrollableCont from './ScrollableCont';
+import MessageItem from './MessageItem';
+import { Loader } from '../utils/Loader'
 
 const styles = (theme: any) => ({
-    messageText: {
-        backgroundColor: teal[100],
-        borderRadius: '50px',
-        padding: '5px 10px',
-        display: 'inline-block',
-        '&$own': {
-            backgroundColor: teal[300],
-        },
+    rootStyles: {
+        position: 'absolute' as 'absolute',
+        height: '100%',
+        overflowX: 'hidden' as 'hidden',
+        overflowY: 'scroll' as 'scroll',
+        left: '0',
+        right: '0'
     },
-    own: {},
-    listText: {
-        flex: '0 0 auto'
+    scrollToEndStyles: {
+        position: 'fixed' as 'fixed',
+        background: grey[300],
+        bottom: '150px',
+        right: '20px',
+        padding: '3px',
+        borderRadius: '50%',
+        cursor: 'pointer'
     },
+    listStyle: {
+        paddingBottom: '200px'
+    }
 });
 
 interface Props extends WithStyles<typeof styles> {
-    messages: Message[];
-    roomUsers: RoomUser[];
-    currentUser: CurrentUser;
+    messages: Message[]
+    lastMessageId?: string
+    roomUsers: RoomUser[]
+    userId: string
+    currentRoomId: string
+    loadingOlder: boolean
+    onSetCursor: () => void
+    loadOlder: (oldestMessageId: number) => void
 }
 
-const MessagesList: React.SFC<Props> = (props) => {
+class MessagesList extends React.Component<Props, {}> {
+    messagesCont: any = React.createRef()
 
-    const getSenderName = (senderId: string) => {
-        let sender = _.find(props.roomUsers, {id: senderId}) as RoomUser
-        return sender ? sender.name : ''
+    componentDidMount() {
+        if (this.props.lastMessageId) {
+            this.scrollToElement(this.props.lastMessageId)
+        }
+        this.props.onSetCursor()
     }
 
-    const renderOtherUserMessage = (message: Message) => {
-        return (
-            <ListItem key={message.id} alignItems="flex-start">
-                <ListItemAvatar>
-                    <Avatar alt="Remy Sharp" src={avatarPlaceholder} />
-                </ListItemAvatar>
-                <ListItemText className={props.classes.listText}
-                    primary={
-                        <Typography component="div" variant="caption">
-                            <strong>{getSenderName(message.senderId)}</strong>: {formatMessageDate(message.createdAt)}
-                        </Typography>
-                    }
-                    secondary={
-                        <Typography variant="body2" className={props.classes.messageText}>
-                            {message.parts[0].payload.content}
-                        </Typography>
-                    }
-                />
-            </ListItem>
-        )
+    componentDidUpdate(prevProps: Props) {
+        if (this.props.lastMessageId !== prevProps.lastMessageId) {
+            this.scrollToElement(this.props.lastMessageId!)
+            this.props.onSetCursor()
+        }
+
+        if (prevProps.currentRoomId !== this.props.currentRoomId) {
+            this.props.onSetCursor()
+        }
     }
 
-    const renderOwnMessages = (message: Message) => {
-        const { classes } = props
-        return (
-            <ListItem key={message.id} style={{justifyContent: 'flex-end'}}>
-                <ListItemText className={classes.listText}
-                    primary={
-                        <Typography component="div" variant="caption">
-                            {formatMessageDate(message.createdAt)}
-                        </Typography>
-                    }
-                    secondary={
-                        <Typography variant="body2" className={cc([classes.messageText, classes.own])}>
-                            {message.parts[0].payload.content}
-                        </Typography>
-                    }
-                />
-            </ListItem>
-        )
+    componentWillUnmount() {
+        if (this.messagesCont) {
+            this.messagesCont.removeEventListener('scroll', this.handleScroll);
+        }
     }
 
-    return (
-        <ScrollableCont>
-            <Grid container justify = "center">
-                <Grid item xs={10}>
-                    <List>
-                        {props.messages.map((message) => (
-                            message.senderId === props.currentUser.userId ? (
-                                renderOwnMessages(message)
-                            ) : (
-                                renderOtherUserMessage(message)
-                            )
-                        ))}
-                    </List>
-                </Grid>
-            </Grid>
-        </ScrollableCont>
+    scrollToElement(messageId: string) {
+
+        let goToContainer = new Promise((resolve, reject) => {
+
+          Events.scrollEvent.register('end', () => {
+            resolve();
+            Events.scrollEvent.remove('end');
+          });
+
+          scroller.scrollTo('scroll-container', {
+            duration: 100,
+            delay: 0,
+          });
+
+        });
+
+        goToContainer.then(() =>
+          scroller.scrollTo(messageId, {
+            duration: 800,
+            delay: 0,
+            smooth: 'easeInOutQuart',
+            containerId: 'scroll-container'
+          }));
+    }
+
+    renderMessage = (message: Message) => (
+        <Element key={message.id} name={String(message.id)}>
+            <MessageItem
+                message={message}
+                userId={this.props.userId}
+                roomUsers={this.props.roomUsers}
+            />
+        </Element>
     )
+
+    messagesContDidMount = (node: any) => {
+        this.messagesCont = node
+        if (this.messagesCont) {
+            this.messagesCont.addEventListener("scroll", this.handleScroll)
+        }
+    }
+
+
+    handleScroll = _.debounce((event: any) => {
+        const { scrollTop } = event.srcElement
+        if (scrollTop === 0) {
+            this.props.loadOlder(this.props.messages[0].id)
+        }
+
+    }, 150);
+
+    render () {
+        return (
+            <div className={this.props.classes.rootStyles} id="scroll-container" ref={this.messagesContDidMount}>
+                {this.props.loadingOlder &&
+                    <Loader />
+                }
+                <Grid container justify = "center">
+                    <Grid item xs={10}>
+                        <List classes={{
+                            root: this.props.classes.listStyle
+                        }}>
+                            {this.props.messages.map((message) => this.renderMessage(message))}
+                        </List>
+                    </Grid>
+                </Grid>
+
+                {this.props.lastMessageId &&
+                    <div
+                        className={this.props.classes.scrollToEndStyles}
+                        onClick={(e: any) => this.scrollToElement(this.props.lastMessageId!)}
+                    >
+                        <KeyboardArrowDown />
+                    </div>
+                }
+            </div>
+        )
+    }
 }
 
 export default withStyles(styles)(MessagesList)
