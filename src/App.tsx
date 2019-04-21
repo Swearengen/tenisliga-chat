@@ -26,42 +26,42 @@ const theme = createMuiTheme({
 });
 
 interface Props {
-  store: Store
+	store: Store
 }
 
 @observer
 class App extends React.Component<Props> {
 
-  componentDidMount() {
-    const { store } = this.props
+	componentDidMount() {
+		const { store } = this.props
 
-    const userName = getUrlParam('userName')
-    const userId = getUrlParam('userId')
+		const userName = getUrlParam('userName')
+		const userId = getUrlParam('userId')
 
-    if (userName && userId) {
-	  store.setCurrentUser(userName, userId)
-	  store.createChatkitUser(userName, userId)
-    } else {
-		store.setInitialErrorMessage('Please provide userName and userId')
+		if (userName && userId) {
+			store.setCurrentUser(userName, userId)
+			// store.createChatkitUser(userName, userId)
+		} else {
+			store.setInitialErrorMessage('Please provide userName and userId')
+		}
 	}
-  }
 
-  render() {
-    const { store } = this.props
+	render() {
+		const { store } = this.props
 
-    return (
-		<MuiThemeProvider theme={theme}>
-			<React.Fragment>
-				<CssBaseline />
-				{store.initialErrorMessage ? (
-					<ErrorPage>{store.initialErrorMessage}</ErrorPage>
-				) : (
-					<Dashboard store={this.props.store} />
-				)}
-			</React.Fragment>
-		</MuiThemeProvider>
-    )
-  }
+		return (
+			<MuiThemeProvider theme={theme}>
+				<React.Fragment>
+					<CssBaseline />
+					{store.initialErrorMessage ? (
+						<ErrorPage>{store.initialErrorMessage}</ErrorPage>
+					) : (
+							<Dashboard store={this.props.store} />
+						)}
+				</React.Fragment>
+			</MuiThemeProvider>
+		)
+	}
 
 }
 
