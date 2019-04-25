@@ -10,6 +10,8 @@ import NotInterested from '@material-ui/icons/NotInterested';
 
 import { formatMessageDate } from '../../utils/general'
 
+import defaultAvatar from '../../assets/avatarPlaceholder.png'
+
 const styles = (theme: any) => ({
     messageText: {
         backgroundColor: teal[100],
@@ -70,7 +72,7 @@ const MessageItem: React.SFC<Props> = (props) => {
         return (
             <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                    <Avatar alt="Remy Sharp" src={sender.avatarURL || '/static/avatarPlaceholder.png'} />
+                    <Avatar alt="Remy Sharp" src={sender.avatarURL || defaultAvatar} />
                 </ListItemAvatar>
                 <ListItemText style={{flex: '0 0 auto'}}
                     primary={

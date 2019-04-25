@@ -2,11 +2,8 @@ import { action, observable, computed } from 'mobx'
 const Chatkit = require('@pusher/chatkit-client');
 import * as _ from 'lodash'
 
-import { UserJoinedRoom, SubscribedRoom, Message, RoomUser, RoomDataCollection, Cursor, CursorHook, PresenceData, PrivateSubscribedRoom } from './types';
+import { UserJoinedRoom, SubscribedRoom, Message, RoomUser, RoomDataCollection, Cursor, CursorHook, PresenceData, PrivateSubscribedRoom, InitialData } from './types';
 import { findPrivateRoom, privateRoomDisplayName } from './utils';
-
-const API_URL = process.env.API_URL
-const CHATKIT_INSTANCE_LOCATOR = process.env.CHATKIT_INSTANCE_LOCATOR
 
 export class Store {
     @observable errorMessage?: string
@@ -39,7 +36,6 @@ export class Store {
             this.cursorCollection[cursor.room_id] = cursor.position
         })
     }
-
 
     @action
     changeRoom = (id: string) => {
@@ -93,17 +89,39 @@ export class Store {
     }
 
     @action
+    loadInitialData = async (userName: string, userId: string) => {
+        this.loading = true
+
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/loadInitialData`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        userName, userId
+                    }),
+                    headers:{'Content-Type': 'application/json'}
+                }
+            )
+            this.loading = false
+            const data = await response.json()
+            return data;
+        } catch (error) {
+            console.log(error);
+            this.loading = false
+            this.errorMessage = "Server Error"
+        }
+    }
+
+    @action
     connectUserRequest = (userId: string) => {
         this.loading = true
 
-        let url = process.env.NODE_ENV === 'production' ? '/api/authenticate' : `${API_URL}/api/authenticate`
-
         const chatManager = new Chatkit.ChatManager({
-            instanceLocator: CHATKIT_INSTANCE_LOCATOR,
+            instanceLocator: process.env.REACT_APP_CHATKIT_INSTANCE_LOCATOR,
             userId,
-            tokenProvider: new Chatkit.TokenProvider({url})
+            tokenProvider: new Chatkit.TokenProvider({url: `${process.env.REACT_APP_API_URL}/authenticate`})
         })
-
 
         chatManager
         .connect({

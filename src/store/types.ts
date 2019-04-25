@@ -74,3 +74,12 @@ export interface Part {
     type: PartType,
     payload: MessagePayload
 }
+
+export interface InitialData {
+    user: {
+        id?: string
+        name?: string
+    },
+    userRooms: UserJoinedRoom[],
+    userCursors: Cursor[]
+}

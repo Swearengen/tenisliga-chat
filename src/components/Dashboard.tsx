@@ -9,11 +9,12 @@ import { WithStyles, withStyles, createStyles } from '@material-ui/core/styles';
 import { Store } from '../store/store';
 import { Loader } from '../components/utils/Loader';
 import { ErrorPage } from '../components/utils/ErrorPage';
-// import AppHeader from './Header'
-// import Sidebar from './Sidebar/Sidebar';
-// import MessagesList from './Messages/MessagesList';
+import Header from './Header';
+import Sidebar from './sidebar/Sidebar';
+import MessagesList from './messages/MessagesList';
 import MessageForm from './messages/MessageForm';
 import TypingIndicator from './messages/TypingIndicator';
+import { InitialData } from '../store/types';
 
 const styles = (theme: any) => createStyles({
 	root: {
@@ -63,16 +64,20 @@ class Dashboard extends React.Component<Props, State> {
 	}
 
 	componentDidMount() {
-		const { store } = this.props
-
-			console.log('prefetching');
-
-			// dohvatit usera s tim userNameom i userId-om
-			// ako ne postoji, ispisat error
-			// ako postoji spremit userId u store
-
-			// loadat userJoinedRooms i cursors, spremit ih u state
-			// nakon toga pozvat connectUser
+		const { store, userId, userName } = this.props
+		store.loadInitialData(userName, userId)
+			.then((data: InitialData) => {
+				if (_.isEmpty(data.user)) {
+					store.setErrorMessage("Please Provide correct userName and userId")
+				} else {
+					store.setUserJoinedRoom(data.userRooms)
+					store.setInitialCursorCollection(data.userCursors)
+					store.connectUser(userId)
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			})
 
 		if (window.innerWidth < 790) {
 			this.setState({
@@ -116,7 +121,7 @@ class Dashboard extends React.Component<Props, State> {
 		return (
 			<div className={classes.root}>
 
-				{/* <AppHeader
+				<Header
 					open={this.state.open}
 					shouldDisplayNotification={store.shouldDisplayHeaderNotification}
 					handleDrawerOpen={this.handleDrawerOpen}
@@ -135,15 +140,14 @@ class Dashboard extends React.Component<Props, State> {
 					changeRoom={store.changeRoom}
 					leagueUserClicked={store.leagueUserClicked}
 					presenceData={toJS(store.presenceData)}
-				/> */}
+				/>
 
 				<main className={classes.content}>
 					{
 						!_.isEmpty(store.messages) &&
 						!_.isEmpty(store.currentRoom) &&
 						<div>
-							messages list
-							{/* <MessagesList
+							<MessagesList
 								messages={store.messages!}
 								roomUsers={store.currentRoom!.users}
 								userId={this.props.userId}
@@ -152,7 +156,7 @@ class Dashboard extends React.Component<Props, State> {
 								loadingOlder={store.loadingOlderMessages}
 								onSetCursor={store.setCursor}
 								loadOlder={store.loadOlderMessages}
-							/> */}
+							/>
 						</div>
 					}
 					<div className={classes.footer}>
