@@ -1,13 +1,11 @@
 import * as React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { observer } from 'mobx-react';
 import * as _ from 'lodash';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import teal from '@material-ui/core/colors/teal';
 import deepPurple from '@material-ui/core/colors/deepPurple'
 import grey from '@material-ui/core/colors/grey'
 
-import Store from './store/store';
 import Dashboard from './components/Dashboard'
 import { ErrorPage } from './components/utils/ErrorPage';
 
@@ -25,17 +23,12 @@ const theme = createMuiTheme({
 	},
 });
 
-interface Props {
-	store: Store
-}
-
 interface State {
 	userName?: string
 	userId?: string
 }
 
-@observer
-class App extends React.Component<Props, State> {
+class App extends React.Component<{}, State> {
 
 	state: State = {}
 
@@ -57,7 +50,7 @@ class App extends React.Component<Props, State> {
 					{!this.state.userId || !this.state.userName ? (
 						<ErrorPage>Please provide UserName and UserId</ErrorPage>
 					) : (
-						<Dashboard store={this.props.store} userId={this.state.userId} userName={this.state.userName} />
+						<Dashboard userId={this.state.userId} userName={this.state.userName} />
 					)}
 				</React.Fragment>
 			</MuiThemeProvider>

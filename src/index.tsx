@@ -1,10 +1,15 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'mobx-react'
+
+import store from './store'
+
 import './index.css';
 import App from './App';
 
-import Store from './store/store';
-
-var store = new Store()
-
-ReactDOM.render(<App store={store} />, document.getElementById('root'));
+ReactDOM.render(
+    <Provider {...store}>
+        <App />
+    </ Provider>,
+    document.getElementById('root')
+)

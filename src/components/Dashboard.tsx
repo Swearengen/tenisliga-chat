@@ -1,12 +1,11 @@
 import React from 'react';
 import * as _ from 'lodash'
 
-import { observer } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { toJS } from 'mobx';
 
 import { WithStyles, withStyles, createStyles } from '@material-ui/core/styles';
 
-import { Store } from '../store/store';
 import { Loader } from '../components/utils/Loader';
 import { ErrorPage } from '../components/utils/ErrorPage';
 import Header from './Header';
@@ -15,6 +14,7 @@ import MessagesList from './messages/MessagesList';
 import MessageForm from './messages/MessageForm';
 import TypingIndicator from './messages/TypingIndicator';
 import { InitialData } from '../store/types';
+import ChatModel from '../store/chatModel';
 
 const styles = (theme: any) => createStyles({
 	root: {
@@ -45,14 +45,18 @@ export const DRAWER_WIDTH = 340;
 
 interface Props extends WithStyles<typeof styles> {
     userName: string
-    userId: string
-	store: Store
+	userId: string
+}
+
+interface InjectedProps extends Props {
+    chatModel: ChatModel
 }
 
 interface State {
 	open: boolean
 }
 
+@inject('chatModel')
 @observer
 class Dashboard extends React.Component<Props, State> {
 
@@ -63,16 +67,22 @@ class Dashboard extends React.Component<Props, State> {
 		}
 	}
 
+	get injected() {
+        return this.props as InjectedProps;
+    }
+
 	componentDidMount() {
-		const { store, userId, userName } = this.props
-		store.loadInitialData(userName, userId)
+		const { userId, userName } = this.props
+		const { chatModel } = this.injected
+
+		chatModel.loadInitialData(userName, userId)
 			.then((data: InitialData) => {
 				if (_.isEmpty(data.user)) {
-					store.setErrorMessage("Please Provide correct userName and userId")
+					chatModel!.setErrorMessage("Please Provide correct userName and userId")
 				} else {
-					store.setUserJoinedRoom(data.userRooms)
-					store.setInitialCursorCollection(data.userCursors)
-					store.connectUser(userId)
+					chatModel!.setUserJoinedRoom(data.userRooms)
+					chatModel!.setInitialCursorCollection(data.userCursors)
+					chatModel!.connectUser(userId)
 				}
 			})
 			.catch((error) => {
@@ -95,26 +105,26 @@ class Dashboard extends React.Component<Props, State> {
 	};
 
 	onMessageFormChange = (text: string) => {
-		this.props.store.setMessageToSend(text)
+		this.injected.chatModel.setMessageToSend(text)
 	}
 
 	sendMessage = () => {
-		this.props.store.sendMessage()
+		this.injected.chatModel.sendMessage()
 	}
 
 	render() {
 		const { classes } = this.props
-		const { store } = this.props
+		const { chatModel } = this.injected
 
-		if (store.loading) {
+		if (chatModel.loading) {
 			return (
 				<Loader />
 			)
 		}
 
-		if (store.errorMessage) {
+		if (chatModel!.errorMessage) {
 			return (
-				<ErrorPage>{store.errorMessage}</ErrorPage>
+				<ErrorPage>{chatModel!.errorMessage}</ErrorPage>
 			)
 		}
 
@@ -123,46 +133,46 @@ class Dashboard extends React.Component<Props, State> {
 
 				<Header
 					open={this.state.open}
-					shouldDisplayNotification={store.shouldDisplayHeaderNotification}
+					shouldDisplayNotification={chatModel!.shouldDisplayHeaderNotification}
 					handleDrawerOpen={this.handleDrawerOpen}
-					currentRoom={store.currentRoom!}
+					currentRoom={chatModel!.currentRoom!}
 				/>
 				<Sidebar
 					open={this.state.open}
-					currentRoomId={store.currentRoomId!}
+					currentRoomId={chatModel.currentRoomId!}
 					userId={this.props.userId}
-					publicRooms={store.publicRooms}
-					privateRooms={store.privateRooms}
-					notificationsCollection={store.notificationsCollection}
-					leagueRoom={store.leagueRoom}
-					leagueUsers={store.usersFromLeagueRoom}
+					publicRooms={chatModel.publicRooms}
+					privateRooms={chatModel.privateRooms}
+					notificationsCollection={chatModel.notificationsCollection}
+					leagueRoom={chatModel.leagueRoom}
+					leagueUsers={chatModel.usersFromLeagueRoom}
 					handleDrawerClose={this.handleDrawerClose}
-					changeRoom={store.changeRoom}
-					leagueUserClicked={store.leagueUserClicked}
-					presenceData={toJS(store.presenceData)}
+					changeRoom={chatModel.changeRoom}
+					leagueUserClicked={chatModel.leagueUserClicked}
+					presenceData={toJS(chatModel.presenceData)}
 				/>
 
 				<main className={classes.content}>
 					{
-						!_.isEmpty(store.messages) &&
-						!_.isEmpty(store.currentRoom) &&
+						!_.isEmpty(chatModel.messages) &&
+						!_.isEmpty(chatModel.currentRoom) &&
 						<div>
 							<MessagesList
-								messages={store.messages!}
-								roomUsers={store.currentRoom!.users}
+								messages={chatModel.messages!}
+								roomUsers={chatModel.currentRoom!.users}
 								userId={this.props.userId}
-								lastMessageId={store.getLastMessageId}
-								currentRoomId={store.currentRoomId!}
-								loadingOlder={store.loadingOlderMessages}
-								onSetCursor={store.setCursor}
-								loadOlder={store.loadOlderMessages}
+								lastMessageId={chatModel.getLastMessageId}
+								currentRoomId={chatModel.currentRoomId!}
+								loadingOlder={chatModel.loadingOlderMessages}
+								onSetCursor={chatModel.setCursor}
+								loadOlder={chatModel.loadOlderMessages}
 							/>
 						</div>
 					}
 					<div className={classes.footer}>
-						<TypingIndicator usersWhoAreTyping={store.usersWhoAreTypingInRoom} />
+						<TypingIndicator usersWhoAreTyping={chatModel!.usersWhoAreTypingInRoom} />
 						<MessageForm
-							value={store.messageToSend}
+							value={chatModel.messageToSend}
 							onChange={this.onMessageFormChange}
 							onSubmit={this.sendMessage}
 						/>

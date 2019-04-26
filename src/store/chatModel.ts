@@ -5,7 +5,7 @@ import * as _ from 'lodash'
 import { UserJoinedRoom, SubscribedRoom, Message, RoomUser, RoomDataCollection, Cursor, CursorHook, PresenceData, PrivateSubscribedRoom, InitialData } from './types';
 import { findPrivateRoom, privateRoomDisplayName } from './utils';
 
-export class Store {
+export class ChatModel {
     @observable errorMessage?: string
     @observable loading: boolean = true;
     @observable loadingOlderMessages: boolean = false
@@ -365,4 +365,4 @@ export class Store {
     }
 }
 
-export default Store
+export default ChatModel
