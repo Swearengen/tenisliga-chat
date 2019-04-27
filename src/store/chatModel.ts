@@ -117,71 +117,72 @@ export class ChatModel {
     connectUserRequest = (userId: string) => {
         this.loading = true
 
-        const chatManager = new Chatkit.ChatManager({
-            instanceLocator: process.env.REACT_APP_CHATKIT_INSTANCE_LOCATOR,
-            userId,
-            tokenProvider: new Chatkit.TokenProvider({url: `${process.env.REACT_APP_API_URL}/authenticate`})
-        })
+        try {
+            const chatManager = new Chatkit.ChatManager({
+                instanceLocator: process.env.REACT_APP_CHATKIT_INSTANCE_LOCATOR,
+                userId,
+                tokenProvider: new Chatkit.TokenProvider({url: `${process.env.REACT_APP_API_URL}/authenticate`})
+            })
 
-        chatManager
-        .connect({
-            onNewReadCursor: (cursor: CursorHook) => {
-                if (cursor.roomId) {
-                    this.cursorCollection[cursor.roomId] = cursor.position
-                }
-            },
-            onPresenceChanged: (state: any, user: any) => {
-                this.presenceData[user.id] = state.current
-            },
-            onAddedToRoom: (room: SubscribedRoom) => {
-                if (this.chatkitUser.id !== room.createdByUserId) {
-                    this.connectToRoom(room.id)
-                }
-            },
-        })
-        .then((currentUser: any) => {
-            this.chatkitUser = currentUser
+            chatManager
+            .connect({
+                onNewReadCursor: (cursor: CursorHook) => {
+                    if (cursor.roomId) {
+                        this.cursorCollection[cursor.roomId] = cursor.position
+                    }
+                },
+                onPresenceChanged: (state: any, user: any) => {
+                    this.presenceData[user.id] = state.current
+                },
+                onAddedToRoom: (room: SubscribedRoom) => {
+                    if (this.chatkitUser.id !== room.createdByUserId) {
+                        this.connectToRoom(room.id)
+                    }
+                },
+            })
+            .then((currentUser: any) => {
+                this.chatkitUser = currentUser
 
-            this.userJoinedRooms!.forEach(room => {
-                this.loading = true
-                this.chatkitUser.subscribeToRoom({
-                    roomId: room.id,
-                    messageLimit: 10,
-                    hooks: {
-                        onMessage: (message: Message) => {
-                            const roomMessages = this.messagesCollection[message.roomId]
-                            this.messagesCollection[message.roomId] = roomMessages ? [...roomMessages, message] : [message]
-                        },
-                        onUserStartedTyping: (user: RoomUser) => {
-                            this.usersWhoAreTyping[room.id] =
-                                this.usersWhoAreTyping[room.id] ? [...this.usersWhoAreTyping[room.id], user.name] : [user.name]
+                this.userJoinedRooms!.forEach(room => {
+                    this.loading = true
+                    this.chatkitUser.subscribeToRoom({
+                        roomId: room.id,
+                        messageLimit: 10,
+                        hooks: {
+                            onMessage: (message: Message) => {
+                                const roomMessages = this.messagesCollection[message.roomId]
+                                this.messagesCollection[message.roomId] = roomMessages ? [...roomMessages, message] : [message]
+                            },
+                            onUserStartedTyping: (user: RoomUser) => {
+                                this.usersWhoAreTyping[room.id] =
+                                    this.usersWhoAreTyping[room.id] ? [...this.usersWhoAreTyping[room.id], user.name] : [user.name]
 
-                        },
-                        onUserStoppedTyping: (user: RoomUser) => {
-                            if (this.usersWhoAreTyping[room.id]) {
-                                this.usersWhoAreTyping[room.id] = this.usersWhoAreTyping[room.id].filter(
-                                    username => username !== user.name
-                                )
+                            },
+                            onUserStoppedTyping: (user: RoomUser) => {
+                                if (this.usersWhoAreTyping[room.id]) {
+                                    this.usersWhoAreTyping[room.id] = this.usersWhoAreTyping[room.id].filter(
+                                        username => username !== user.name
+                                    )
+                                }
                             }
                         }
-                    }
-                })
-                .then((currentRoom: SubscribedRoom) => {
-                    this.loading = false
-                    this.subscribedRooms = this.subscribedRooms ? [...this.subscribedRooms, currentRoom] : [currentRoom]
-                })
-                .catch((err: any) => {
-                    console.log(err);
-                    this.loading = false
-                    this.errorMessage = err.info ? err.info.error_description : 'Server error'
-                })
-            });
-        })
-        .catch((error: any) => {
+                    })
+                    .then((currentRoom: SubscribedRoom) => {
+                        this.loading = false
+                        this.subscribedRooms = this.subscribedRooms ? [...this.subscribedRooms, currentRoom] : [currentRoom]
+                    })
+                    .catch((err: any) => {
+                        console.log(err);
+                        this.loading = false
+                        this.errorMessage = err.info ? err.info.error_description : 'Server error'
+                    })
+                });
+            })
+        } catch (error) {
             console.error(error)
             this.loading = false
             this.errorMessage = error.info ? error.info.error_description : 'Server error'
-        })
+        }
     }
 
     @action
