@@ -16,7 +16,6 @@
 /environment
 .env.production
 .env.development
-.serverless
 
 npm-debug.log*
 yarn-debug.log*

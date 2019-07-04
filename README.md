@@ -12,7 +12,7 @@ In the project directory, you can run:
 
 Runs the app in the development mode.<br>
 
-Project uses chatkit api keys inside env variables which are required to run the project.
+**Project uses chatkit api keys inside env variables which are required to run the project locally.**
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
@@ -23,3 +23,7 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
+
+## Live version
+
+[tenisliga-chat](http://tenisliga-chat.s3-website-us-east-1.amazonaws.com)
